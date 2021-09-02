@@ -4,12 +4,11 @@ using UnityEngine;
 
 public class Map : MonoBehaviour
 {
-    public GameObject hexPrefab;
+    [SerializeField] private GameObject hexPrefab;
+    [SerializeField] private GameObject _prefabNotСollapsingWall;
+    private GameObject _createdWalls;
 
-    // Size of the map in terms of number of hex tiles
-    // This is NOT representative of the amount of 
-    // world space that we're going to take up.
-    // (i.e. our tiles might be more or less than 1 Unity World Unit)
+
     int width = 40;
     int height = 40;
 
@@ -19,35 +18,50 @@ public class Map : MonoBehaviour
     // Use this for initialization
     void Start () 
     {
-	
-        for (int x = 0; x < width; x++) 
-        {
-            for (int y = 0; y < height; y++) 
-            {
-
-                float xPos = x * xOffset;
-                
-                if( y % 2 == 1 ) 
-                {
-                    xPos += xOffset/2f;
-                }
-
-                GameObject hex_go = (GameObject)Instantiate(hexPrefab, new Vector3( xPos,0, y * zOffset  ), Quaternion.identity  );
-                
-                hex_go.name = "Hex_" + x + "_" + y;
-                
-                hex_go.GetComponent<Hex>().x = x;
-                hex_go.GetComponent<Hex>().y = y;
-                
-                hex_go.transform.SetParent(this.transform);
-                
-                hex_go.isStatic = true;
-
-            }
-        }
-
+	    CreateMap();
     }
-	
+
+    private void CreateMap()
+    {
+	    for (int x = 0; x < width; x++) 
+	    {
+		    for (int y = 0; y < height; y++) 
+		    {
+			    float xPos = x * xOffset;
+                
+			    if( y % 2 == 1 ) 
+			    {
+				    xPos += xOffset/2f;
+			    }
+
+			    GameObject hexGO = (GameObject)Instantiate(hexPrefab, new Vector3( xPos,0, y * zOffset  ), Quaternion.identity  );
+			    SetOptionsForCell(hexGO,"Hex_", x,y);
+
+			    if (x == 0 || x == 39 ||  y == 39 || y == 0)
+			    {
+				    _createdWalls = (GameObject)Instantiate(_prefabNotСollapsingWall, new Vector3( xPos,0, y * zOffset  ), Quaternion.identity  );
+				    SetOptionsForCell(_createdWalls,"HexWall_", x,y);
+			    }
+			    
+			    
+			    void SetOptionsForCell(GameObject cell, string nameCell, int x, int y)
+			    {
+				    cell.name = nameCell + x + "_" + y;
+                
+				    cell.GetComponent<Hex>().x = x;
+				    cell.GetComponent<Hex>().y = y;
+                
+				    cell.transform.SetParent(this.transform);
+                
+				    cell.isStatic = true;
+			    }
+
+			   
+
+		    }
+	    }
+    }
+
     // Update is called once per frame
     void Update () 
     {
