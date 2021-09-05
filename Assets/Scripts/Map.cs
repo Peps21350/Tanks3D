@@ -5,12 +5,17 @@ using UnityEngine;
 public class Map : MonoBehaviour
 {
     [SerializeField] private GameObject hexPrefab;
-    [SerializeField] private GameObject _prefabNotСollapsingWall;
+    [SerializeField] private GameObject _prefabIndestructibleWall;
+    [SerializeField] private GameObject _prefabDestructibleWall;
     private GameObject _createdWalls;
+    
+    
+	// a place where obstacles do not spawn
+	private const int _AmountCellWhereDontSpawnObstacles = 3;
 
 
-    int width = 40;
-    int height = 40;
+    int widthMap = 40;
+    int heightMap = 40;
 
     float xOffset = 0.882f;
     float zOffset = 0.764f;
@@ -18,14 +23,46 @@ public class Map : MonoBehaviour
     // Use this for initialization
     void Start () 
     {
-	    CreateMap();
+	    CreatingMap();
+	    CreatingObstacles();
     }
 
-    private void CreateMap()
+
+    private void CreatingObstacles()
     {
-	    for (int x = 0; x < width; x++) 
+	    int randAmountObstacles = Random.Range(widthMap, widthMap * heightMap / 2);
+	    for (int i = 0; i < randAmountObstacles; i++)
 	    {
-		    for (int y = 0; y < height; y++) 
+		    int randPositionX = Random.Range(_AmountCellWhereDontSpawnObstacles, heightMap - 1);
+		    int randPositionY = Random.Range(_AmountCellWhereDontSpawnObstacles, widthMap - 1);
+		    float xRandPos = randPositionX * xOffset;
+		    if( randPositionY % 2 == 1 ) 
+		    {
+			    xRandPos += xOffset/2f;
+		    }
+
+		    if (i % 2 == 1)
+		    {
+			    GameObject createdDestructibleWall = (GameObject)Instantiate(_prefabDestructibleWall, new Vector3( xRandPos,0, randPositionY * zOffset  ), Quaternion.identity  );
+			    SetOptionsForCell(createdDestructibleWall,"HexDestructibleWall_", 0,i);
+		    }
+		    else
+		    {
+			    GameObject createdIndestructibleWall = (GameObject)Instantiate(_prefabIndestructibleWall, new Vector3( xRandPos,0, randPositionY * zOffset  ), Quaternion.identity  );
+			    SetOptionsForCell(createdIndestructibleWall,"HexIndestructibleWall_", 0,i);
+		    }
+
+		    
+	    }
+
+	    
+    }
+
+    private void CreatingMap()
+    {
+	    for (int x = 0; x < widthMap; x++) 
+	    {
+		    for (int y = 0; y < heightMap; y++) 
 		    {
 			    float xPos = x * xOffset;
                 
@@ -37,29 +74,26 @@ public class Map : MonoBehaviour
 			    GameObject hexGO = (GameObject)Instantiate(hexPrefab, new Vector3( xPos,0, y * zOffset  ), Quaternion.identity  );
 			    SetOptionsForCell(hexGO,"Hex_", x,y);
 
-			    if (x == 0 || x == 39 ||  y == 39 || y == 0)
+			    if (x == 0 || x == widthMap-1 ||  y == heightMap-1 || y == 0)
 			    {
-				    _createdWalls = (GameObject)Instantiate(_prefabNotСollapsingWall, new Vector3( xPos,0, y * zOffset  ), Quaternion.identity  );
+				    _createdWalls = (GameObject)Instantiate(_prefabIndestructibleWall, new Vector3( xPos,0, y * zOffset  ), Quaternion.identity  );
 				    SetOptionsForCell(_createdWalls,"HexWall_", x,y);
 			    }
 			    
-			    
-			    void SetOptionsForCell(GameObject cell, string nameCell, int x, int y)
-			    {
-				    cell.name = nameCell + x + "_" + y;
-                
-				    cell.GetComponent<Hex>().x = x;
-				    cell.GetComponent<Hex>().y = y;
-                
-				    cell.transform.SetParent(this.transform);
-                
-				    cell.isStatic = true;
-			    }
-
-			   
-
 		    }
 	    }
+    }
+    
+    private void SetOptionsForCell(GameObject cell, string nameCell, int x, int y)
+    {
+	    cell.name = nameCell + x + "_" + y;
+                
+	    cell.GetComponent<Hex>().x = x;
+	    cell.GetComponent<Hex>().y = y;
+                
+	    cell.transform.SetParent(this.transform);
+                
+	    cell.isStatic = true;
     }
 
     // Update is called once per frame
