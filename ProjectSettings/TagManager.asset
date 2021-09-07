@@ -6,6 +6,9 @@ TagManager:
   tags:
   - Indestructible
   - Destructible
+  - Bonus
+  - Enemi
+  - Projectile
   layers:
   - Default
   - TransparentFX

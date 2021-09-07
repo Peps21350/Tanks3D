@@ -8,26 +8,57 @@ public class Tank : MonoBehaviour
 {
     [SerializeField] private GameObject _projectilePrefab;
     [SerializeField] private GameObject Barrel;
-
-    private float _health;
-    public float speed;
-    private float _rangeofshots;
-    private float _timeReload = 5;
+    
+    [SerializeField] private float speed;
+    [SerializeField] private float _timeReload = 5;
     public bool _opportunityToShoot = true;
     private float _currentTime = 0;
+    [SerializeField] private bool isEnemi = true;
 
     private Rigidbody _tankRB;
 
-    public void init(float health, float speed, float damage, float rangeofshots, float speedReload)
+    public void init( float speed, float damage, float speedReload)
     {
-        _health = health;
         this.speed = speed;
-        _rangeofshots = rangeofshots;
         _timeReload = speedReload;
         _tankRB = GetComponent<Rigidbody>();
     }
 
-    public void Fier()
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.gameObject.CompareTag("Bonus"))
+        {
+            if (other.gameObject.GetComponent<Bonus>().TypeBonus == TypeBonus.ReductionRecharging)
+            {
+                _timeReload--;
+            }
+            else
+            {
+                _projectilePrefab.GetComponent<Projectile>()._flightRange++;
+            }
+        }
+
+        if (other.gameObject.CompareTag("Projectile") &&
+            other.gameObject.GetComponent<Projectile>().isProjectileEnemi == isEnemi)
+        {
+            Destroy(other.gameObject);
+        }
+
+        else
+        {
+            Destroy(gameObject);
+            MobsSpawn.aliveTanks--;
+            Destroy(other.gameObject);
+            if (MobsSpawn.aliveTanks == 0)
+            {
+                
+            }
+        }
+    }
+    
+    
+
+    public void Fier(bool isEnemi)
     {
         if (_opportunityToShoot == true)
         {
@@ -35,7 +66,7 @@ public class Tank : MonoBehaviour
             Vector3 positionSpawnProjectile = Barrel.transform.position;
             Quaternion rotationProjectile = Barrel.transform.rotation;
             GameObject createdProjectile = Instantiate(_projectilePrefab, positionSpawnProjectile, rotationProjectile);
-            createdProjectile.GetComponent<Projectile>().init(2,2,2);
+            createdProjectile.GetComponent<Projectile>().init(2f,1,1,gameObject, isEnemi);
 
             createdProjectile.GetComponent<Projectile>().Move();
             _currentTime = 0;
@@ -45,7 +76,14 @@ public class Tank : MonoBehaviour
 
     public void Move(float horizontal, float vertical)
     {
-        _tankRB.velocity = new Vector3(horizontal * speed, _tankRB.velocity.y, vertical * speed);
+        if(_tankRB != null)
+            _tankRB.velocity = new Vector3(horizontal * speed, _tankRB.velocity.y, vertical * speed);
+        
+    }
+
+    public void Rotate()
+    {
+        _tankRB.rotation = Quaternion.LookRotation(_tankRB.velocity  * Time.fixedTime) ;
     }
 
 
