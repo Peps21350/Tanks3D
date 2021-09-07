@@ -5,6 +5,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private JoystickController _joystickController;
     [SerializeField] private Tank _tank;
     [SerializeField] private GameObject screensaver;
+    
   
 
 
@@ -17,7 +18,7 @@ public class PlayerController : MonoBehaviour
             _tank.Rotate();
         }
 
-        if (_tank._opportunityToShoot == false && Map.isStart == true)
+        if (_tank._opportunityToShoot == false)
         {
             screensaver.SetActive(true);
         }

@@ -17,7 +17,7 @@ public class Tank : MonoBehaviour
 
     private Rigidbody _tankRB;
 
-    public void init( float speed, float damage, float speedReload)
+    public void init( float speed, float speedReload)
     {
         this.speed = speed;
         _timeReload = speedReload;
@@ -38,22 +38,26 @@ public class Tank : MonoBehaviour
             }
         }
 
-        if (other.gameObject.CompareTag("Projectile") &&
-            other.gameObject.GetComponent<Projectile>().isProjectileEnemi == isEnemi)
+        if (other.gameObject.CompareTag("Projectile"))
         {
-            Destroy(other.gameObject);
-        }
-
-        else
-        {
-            Destroy(gameObject);
-            MobsSpawn.aliveTanks--;
-            Destroy(other.gameObject);
-            if (MobsSpawn.aliveTanks == 0)
+            if (other.gameObject.GetComponent<Projectile>().isProjectileEnemi != isEnemi)
             {
-                
+                Destroy(gameObject);
+                MobsSpawn.aliveTanks--;
+                Destroy(other.gameObject);
+                if (MobsSpawn.aliveTanks == 0)
+                {
+                    GameMechanic.playerWin = true;
+                    //GameGUI
+
+                }
+            }
+            else
+            {
+                Destroy(other.gameObject);
             }
         }
+        
     }
     
     

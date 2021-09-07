@@ -42,15 +42,15 @@ public class Projectile : MonoBehaviour
                 {
                         Destroy(gameObject);
                 }
-                if (other.gameObject.CompareTag("Enemi"))
-                {
-                        
-                        Destroy(other.gameObject);
-                        int randBonus = Random.Range(0, 2);
-                        Bonus.CreatingBonus(other.gameObject.transform.position,randBonus);
-                        destroyedObject++;
-                        Destroy(gameObject);
-                }
+                // if (other.gameObject.CompareTag("Enemi"))
+                // {
+                //         
+                //         Destroy(other.gameObject);
+                //         int randBonus = Random.Range(0, 2);
+                //         Bonus.CreatingBonus(other.gameObject.transform.position,randBonus);
+                //         destroyedObject++;
+                //         Destroy(gameObject);
+                // }
 
                 if (other.gameObject.CompareTag("Projectile"))
                 {
