@@ -8,9 +8,9 @@ public class Projectile : MonoBehaviour
 {
         public float _flightRange;
         public float _speed;
-        public float _damage;
         private Vector3 _spawnPosition;
         public GameObject _tank;
+        [SerializeField] private Bonus _bonus;
         public static int destroyedObject;
         public bool isProjectileEnemi = true;
         
@@ -19,7 +19,6 @@ public class Projectile : MonoBehaviour
         {
                 _flightRange = flightRange;
                 _speed = speed;
-                _damage = damage;
                 _tank = tank;
                 this.isProjectileEnemi = isProjectileEnemi;
         }
@@ -32,8 +31,9 @@ public class Projectile : MonoBehaviour
                         destroyedObject++;
                         if (destroyedObject % 2 == 0)
                         {
-                                int randBonus = Random.Range(0, 2);
-                                Bonus.CreatingBonus(other.gameObject.transform.position,randBonus);
+                                int numberBonus = Random.Range(0, 2);
+                                Vector3 position = other.gameObject.transform.position;
+                                _bonus.CreatingBonus(position,numberBonus);
                         }
 
                         Destroy(gameObject);
@@ -42,16 +42,7 @@ public class Projectile : MonoBehaviour
                 {
                         Destroy(gameObject);
                 }
-                // if (other.gameObject.CompareTag("Enemi"))
-                // {
-                //         
-                //         Destroy(other.gameObject);
-                //         int randBonus = Random.Range(0, 2);
-                //         Bonus.CreatingBonus(other.gameObject.transform.position,randBonus);
-                //         destroyedObject++;
-                //         Destroy(gameObject);
-                // }
-
+                
                 if (other.gameObject.CompareTag("Projectile"))
                 {
                         Destroy(other.gameObject);

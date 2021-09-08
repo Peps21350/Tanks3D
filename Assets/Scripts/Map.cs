@@ -1,13 +1,14 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AI;
 
 public class Map : MonoBehaviour
 {
     [SerializeField] private GameObject hexPrefab;
     [SerializeField] private GameObject _prefabIndestructibleWall;
     [SerializeField] private GameObject _prefabDestructibleWall;
+    [SerializeField] private GameObject _nawMesh;
     private GameObject _createdWalls;
     [HideInInspector] public List<int> busyCoordsX;
     [HideInInspector] public List<int> busyCoordsZ;
@@ -19,7 +20,7 @@ public class Map : MonoBehaviour
 	public const int AmountCellWhereDontSpawnObstacles = 3;
 
 
-    [HideInInspector] public int widthMap = 40;
+	[HideInInspector] public int widthMap = 40;
     [HideInInspector] public int heightMap = 40;
 
     float xOffset = 0.882f;
@@ -33,12 +34,9 @@ public class Map : MonoBehaviour
 		    CreatingMap();
 		    CreatingObstacles();
 	    }
-	    //if(Projectile.destroyedObject > 5)
-		//    _bonus.CreatingBonus();
-		    
     }
 
-    
+
     private void CreatingObstacles()
     {
 	    int randAmountObstacles = Random.Range(widthMap, widthMap * heightMap / 2);
@@ -71,6 +69,9 @@ public class Map : MonoBehaviour
 		    else
 			    randAmountObstacles++;
 	    }
+	    _nawMesh.SetActive(true);
+	    _nawMesh.GetComponent<NavMeshSurface>().BuildNavMesh();
+
     }
 
     private void CreatingMap()
@@ -105,10 +106,10 @@ public class Map : MonoBehaviour
     public bool CheсkCoordWithList(int valueX, int valueZ)
     {
 	    bool result = true;
-	    var  coordsXZ =  busyCoordsX.Zip(busyCoordsZ, (x, z) => new { busyCoordsX = x, busyCoordsZ = z });
+	    var  coordsXZ =  busyCoordsX.Zip(busyCoordsZ, (x, z) => new Vector2Int( x, z ));
 	    foreach (var coords in coordsXZ)
 	    {
-		    if (coords.busyCoordsX == valueX && coords.busyCoordsZ == valueZ)
+		    if (coords.x == valueX && coords.y == valueZ)
 		    {
 			    result = false;
 			    break;

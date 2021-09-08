@@ -1,13 +1,14 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class MobsSpawn : MonoBehaviour
 {
     [SerializeField] private Map _map;
     [SerializeField] private GameObject[] _tanksPrefabs;
+    [SerializeField] private HunterTank _hunterTank;
+    [SerializeField] private OrdinaryEnemiTank _ordinaryEnemiTank;
     [SerializeField] private int countTanks = 8;
-    [HideInInspector] public static int aliveTanks;
+    public static int aliveTanks;
 
 
     private void Spawn()
@@ -21,12 +22,18 @@ public class MobsSpawn : MonoBehaviour
             {
                 if (i % 2 == 0)
                 {
-                    GameObject createdTanks = Instantiate(_tanksPrefabs[0], positionTank,Quaternion.identity);
+                    GameObject createdHunterTank = Instantiate(_tanksPrefabs[0], positionTank,Quaternion.identity);
+                    _ordinaryEnemiTank.init(1,5);
+                    //createdHunterTank.transform.SetParent(_map.transform);
+                    
+                    
                 }
 
                 else
                 {
-                    GameObject createdTanks = Instantiate(_tanksPrefabs[1], positionTank, Quaternion.identity);
+                    GameObject createdOrdinaryEnemyTank= Instantiate(_tanksPrefabs[1], positionTank,Quaternion.identity);
+                    _hunterTank.init(0.5f, 7);
+                    //createdOrdinaryEnemyTank.transform.SetParent(_map.transform);
                 }
             }
         }

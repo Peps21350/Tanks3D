@@ -1,39 +1,40 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography;
+﻿using System.Collections;
 using UnityEngine;
+using Random = UnityEngine.Random;
+
 
 public class Tank : MonoBehaviour
 {
-    [SerializeField] private GameObject _projectilePrefab;
-    [SerializeField] private GameObject Barrel;
+    [SerializeField] protected GameObject _projectilePrefab;
+    [SerializeField] protected GameObject Barrel;
+    [SerializeField] protected Bonus _bonus;
+    [SerializeField] protected GameGUI _gameGUI;
     
-    [SerializeField] private float speed;
-    [SerializeField] private float _timeReload = 5;
-    public bool _opportunityToShoot = true;
-    private float _currentTime = 0;
-    [SerializeField] private bool isEnemi = true;
-
-    private Rigidbody _tankRB;
+    [SerializeField] protected float speed;
+    [SerializeField] protected float _timeReload;
+    public bool _opportunityToShoot = false;
+    [SerializeField] private  float _currentTime = 0;
+    [SerializeField] protected bool isEnemi = true;
+    protected Rigidbody _tankRB;
 
     public void init( float speed, float speedReload)
     {
         this.speed = speed;
         _timeReload = speedReload;
-        _tankRB = GetComponent<Rigidbody>();
     }
 
-    private void OnCollisionEnter(Collision other)
+    protected virtual void OnCollisionEnter(Collision other)
     {
         if (other.gameObject.CompareTag("Bonus"))
         {
             if (other.gameObject.GetComponent<Bonus>().TypeBonus == TypeBonus.ReductionRecharging)
             {
+                Destroy(other.gameObject);
                 _timeReload--;
             }
             else
             {
+                Destroy(other.gameObject);
                 _projectilePrefab.GetComponent<Projectile>()._flightRange++;
             }
         }
@@ -45,11 +46,13 @@ public class Tank : MonoBehaviour
                 Destroy(gameObject);
                 MobsSpawn.aliveTanks--;
                 Destroy(other.gameObject);
+                Vector3 position = gameObject.transform.position;
+                int numberBonus = Random.Range(0, 2);
+                _bonus.CreatingBonus(position,numberBonus);
                 if (MobsSpawn.aliveTanks == 0)
                 {
                     GameMechanic.playerWin = true;
-                    //GameGUI
-
+                    _gameGUI.DisplayENDMenu();
                 }
             }
             else
@@ -64,33 +67,17 @@ public class Tank : MonoBehaviour
 
     public void Fier(bool isEnemi)
     {
-        if (_opportunityToShoot == true)
+        if (_opportunityToShoot == true && _projectilePrefab != null)
         {
-            
             Vector3 positionSpawnProjectile = Barrel.transform.position;
             Quaternion rotationProjectile = Barrel.transform.rotation;
             GameObject createdProjectile = Instantiate(_projectilePrefab, positionSpawnProjectile, rotationProjectile);
             createdProjectile.GetComponent<Projectile>().init(2f,1,1,gameObject, isEnemi);
-
             createdProjectile.GetComponent<Projectile>().Move();
             _currentTime = 0;
-            //Destroy(createdProjectile,2);
         }
     }
-
-    public void Move(float horizontal, float vertical)
-    {
-        if(_tankRB != null)
-            _tankRB.velocity = new Vector3(horizontal * speed, _tankRB.velocity.y, vertical * speed);
-        
-    }
-
-    public void Rotate()
-    {
-        _tankRB.rotation = Quaternion.LookRotation(_tankRB.velocity  * Time.fixedTime) ;
-    }
-
-
+    
     IEnumerator Reload()
     {
         while(true) 
@@ -100,13 +87,11 @@ public class Tank : MonoBehaviour
                 if (_currentTime >= _timeReload)
                 {
                     _opportunityToShoot = true;
-                    
                 }
                 else
                 {
                     _opportunityToShoot = false;
                 }
-
                 yield return new WaitForSeconds(1);
         }
         // ReSharper disable once IteratorNeverReturns
