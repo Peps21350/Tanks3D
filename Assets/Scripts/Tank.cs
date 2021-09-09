@@ -9,15 +9,18 @@ public class Tank : MonoBehaviour
     [SerializeField] protected GameObject Barrel;
     [SerializeField] protected Bonus _bonus;
     [SerializeField] protected GameGUI _gameGUI;
-    
     [SerializeField] protected float speed;
     [SerializeField] protected float _timeReload;
-    public bool _opportunityToShoot = false;
-    [SerializeField] private  float _currentTime = 0;
-    [SerializeField] protected bool isEnemi = true;
-    protected Rigidbody _tankRB;
+    [SerializeField] protected bool isEnemy = true;
 
-    public void init( float speed, float speedReload)
+    [SerializeField] private float _currentTime = 0;
+    [SerializeField] protected float flightDistanceProjectile = 0.8f;
+
+    protected Rigidbody _tankRB;
+    public bool _opportunityToShoot = false;
+
+
+    public void init(float speed, float speedReload)
     {
         this.speed = speed;
         _timeReload = speedReload;
@@ -35,20 +38,20 @@ public class Tank : MonoBehaviour
             else
             {
                 Destroy(other.gameObject);
-                _projectilePrefab.GetComponent<Projectile>()._flightRange++;
+                flightDistanceProjectile += 0.4f;
             }
         }
 
         if (other.gameObject.CompareTag("Projectile"))
         {
-            if (other.gameObject.GetComponent<Projectile>().isProjectileEnemi != isEnemi)
+            if (other.gameObject.GetComponent<Projectile>().isProjectileEnemi != isEnemy)
             {
                 Destroy(gameObject);
                 MobsSpawn.aliveTanks--;
                 Destroy(other.gameObject);
                 Vector3 position = gameObject.transform.position;
                 int numberBonus = Random.Range(0, 2);
-                _bonus.CreatingBonus(position,numberBonus);
+                _bonus.CreatingBonus(position, numberBonus);
                 if (MobsSpawn.aliveTanks == 0)
                 {
                     GameMechanic.playerWin = true;
@@ -60,10 +63,8 @@ public class Tank : MonoBehaviour
                 Destroy(other.gameObject);
             }
         }
-        
     }
-    
-    
+
 
     public void Fier(bool isEnemi)
     {
@@ -72,27 +73,28 @@ public class Tank : MonoBehaviour
             Vector3 positionSpawnProjectile = Barrel.transform.position;
             Quaternion rotationProjectile = Barrel.transform.rotation;
             GameObject createdProjectile = Instantiate(_projectilePrefab, positionSpawnProjectile, rotationProjectile);
-            createdProjectile.GetComponent<Projectile>().init(2f,1,1,gameObject, isEnemi);
+            createdProjectile.GetComponent<Projectile>().init(flightDistanceProjectile, 1, 1, gameObject, isEnemi);
             createdProjectile.GetComponent<Projectile>().Move();
             _currentTime = 0;
         }
     }
-    
+
     IEnumerator Reload()
     {
-        while(true) 
+        while (true)
         {
-                _currentTime++;
-                Debug.Log("_opportunityToShoot: " + (_opportunityToShoot) + (_currentTime));
-                if (_currentTime >= _timeReload)
-                {
-                    _opportunityToShoot = true;
-                }
-                else
-                {
-                    _opportunityToShoot = false;
-                }
-                yield return new WaitForSeconds(1);
+            _currentTime++;
+            Debug.Log("_opportunityToShoot: " + (_opportunityToShoot) + (_currentTime));
+            if (_currentTime >= _timeReload)
+            {
+                _opportunityToShoot = true;
+            }
+            else
+            {
+                _opportunityToShoot = false;
+            }
+
+            yield return new WaitForSeconds(1);
         }
         // ReSharper disable once IteratorNeverReturns
     }
@@ -101,5 +103,7 @@ public class Tank : MonoBehaviour
     {
         StartCoroutine(Reload());
         _tankRB = GetComponent<Rigidbody>();
+        
+       
     }
 }

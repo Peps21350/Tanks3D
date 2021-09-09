@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
 public sealed class JoystickController : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
@@ -8,6 +6,8 @@ public sealed class JoystickController : MonoBehaviour, IPointerDownHandler, IDr
     public float Horizontal => _input.x;
     public float Vertical => _input.y;
 
+    private float[,] angleMass = {{10, 60}, {60, 120,}, {120, 170}, {-10, -60}, {-60, -120}, {-120, -170}};
+    private float[,] positionToMove = {{0.866f, 0.5f}, {0,1}, {-0.866f, 0.5f}, {0.866f, -0.5f}, {0,-1}, {-0.866f, -0.5f}};
     public float HandleRange
     {
         set => _handleRange = Mathf.Abs(value);
@@ -19,6 +19,7 @@ public sealed class JoystickController : MonoBehaviour, IPointerDownHandler, IDr
     
     private RectTransform _baseRect = null;
     private Vector2 _input = Vector2.zero;
+    private float angle = 0;
 
     private void Start()
     {
@@ -43,6 +44,22 @@ public sealed class JoystickController : MonoBehaviour, IPointerDownHandler, IDr
         _input = (eventData.position - position) / radius ;
         HandleInput(_input.magnitude, _input.normalized, radius);
         _joystickHandle.anchoredPosition = _input * radius * _handleRange;
+        //AngleCheck();
+    }
+
+    private void AngleCheck()
+    {
+        float angle = Mathf.Atan2(_input.y, _input.x) * Mathf.Rad2Deg;
+        int rows = angleMass.GetUpperBound(0) + 1;
+        int columns = angleMass.Length / rows;
+        for (int i = 0; i < rows; i++)
+        {
+            if (angle > angleMass[i,0] && angle < angleMass[i,1])
+            {
+                _input.x = positionToMove[i, 0];
+                _input.y = positionToMove[i, 1];
+            }
+        }
     }
 
     private void HandleInput(float magnitude, Vector2 normalised, Vector2 radius)

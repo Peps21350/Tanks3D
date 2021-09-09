@@ -2,7 +2,6 @@
 
 public class PlayerTank : Tank
 {
-    
     public virtual void Move(float horizontal, float vertical)
     {
         if(_tankRB != null)

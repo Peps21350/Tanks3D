@@ -8,8 +8,8 @@ public class HunterTank : Tank
     public float seeDistance = 5f;
     public float attackDistance = 2f;
     [SerializeField] private NavMeshAgent _navMeshAgent;
-   
-    
+
+
     // public  void Move()
     // {
     //         _tankRB.transform.position += new Vector3(); 
@@ -36,7 +36,7 @@ public class HunterTank : Tank
 
         if (other.collider.CompareTag("Destructible"))
         {
-            Fier(isEnemi);
+            Fier(isEnemy);
         }
 
     }
@@ -45,8 +45,7 @@ public class HunterTank : Tank
 
 
     void Start ()
-    {      
-        
+    {
         _navMeshAgent.speed = speed;
     }
    
@@ -54,6 +53,7 @@ public class HunterTank : Tank
     {
         targetPosition = target.transform;
         var position = targetPosition.position;
+        Fier(isEnemy);
         if (Vector3.Distance (transform.position, targetPosition.transform.position) < seeDistance) 
         {
             if (Vector3.Distance (transform.position, targetPosition.transform.position) > attackDistance) 
@@ -69,10 +69,10 @@ public class HunterTank : Tank
             {
                 _navMeshAgent.speed = 0;
                 transform.LookAt (targetPosition.transform);
-                if (_opportunityToShoot == true)
-                {
-                    Fier(isEnemi);
-                }
+                // if (_opportunityToShoot == true)
+                // {
+                //     Fier(isEnemy);
+                // }
             }
         }
         else

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 
-public class OrdinaryEnemiTank : Tank
+public class OrdinaryEnemyTank : Tank
 {
         private Vector3 targetPosition;
         [SerializeField] private PlayerTank _playerTank;
@@ -17,13 +17,14 @@ public class OrdinaryEnemiTank : Tank
                 
                 if (other.collider.CompareTag("Destructible"))
                 {
-                        Fier(isEnemi);
+                        Fier(isEnemy);
                 }
         }
         
         void Start ()
         {
                 _navMeshAgent.speed = speed;
+                CreatingTargetPosition();
         }
 
         private void CreatingTargetPosition()
@@ -32,7 +33,7 @@ public class OrdinaryEnemiTank : Tank
                 int randPositionZ = Random.Range(1, _map.widthMap - 1);
                 if (_map.CheсkCoordWithList(randPositionX, randPositionZ))
                 {
-                        targetPosition = new Vector3(randPositionX, 0.07f, randPositionX);
+                        targetPosition = new Vector3(randPositionX, 0f, randPositionX);
                 }
         }
 
@@ -53,13 +54,14 @@ public class OrdinaryEnemiTank : Tank
                                 transform.LookAt (playerCoord);
                                 if (_opportunityToShoot == true)
                                 {
-                                        Fier(isEnemi);
+                                        Fier(isEnemy);
                                 }
                         }
                 }
                 else
                 {
-                        _navMeshAgent.destination = targetPosition;
+                        //_navMeshAgent.destination = targetPosition;
+                        _navMeshAgent.destination = new Vector3(12, 0.07f, 22);
                 }
         }
 }

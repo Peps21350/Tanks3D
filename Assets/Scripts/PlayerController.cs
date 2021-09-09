@@ -13,7 +13,7 @@ public class PlayerController : MonoBehaviour
     {
         
         _playerTank.Move(_joystickController.Horizontal,_joystickController.Vertical);
-        if (_joystickController.Horizontal != 0 || _joystickController.Vertical != 0)
+        if (_joystickController.Horizontal != 0  && _joystickController.Vertical != 0)
         {
             //_playerTank.Rotate();
             //Debug.Log($"{_joystickController.Horizontal} + {_joystickController.Vertical }");
@@ -42,6 +42,4 @@ public class PlayerController : MonoBehaviour
             screensaver.SetActive(false);
         }
     }
-
-   
 }

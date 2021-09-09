@@ -19,6 +19,10 @@ public class Map : MonoBehaviour
 	// a place where obstacles do not spawn
 	public const int AmountCellWhereDontSpawnObstacles = 3;
 
+	private float _xPos;
+	private float _zPos;
+	
+
 
 	[HideInInspector] public int widthMap = 40;
     [HideInInspector] public int heightMap = 40;
@@ -39,20 +43,18 @@ public class Map : MonoBehaviour
 
     private void CreatingObstacles()
     {
-	    int randAmountObstacles = Random.Range(widthMap, widthMap * heightMap / 2);
+	    int minCountObstacle = (heightMap * widthMap) / 5;
+	    int maxCountObstacle = (heightMap * widthMap) / 4;
+	    
+	    int randAmountObstacles = Random.Range(minCountObstacle, maxCountObstacle);
 	    for (int i = 0; i < randAmountObstacles; i++)
 	    {
 		    int randPositionX = Random.Range(AmountCellWhereDontSpawnObstacles, heightMap - 1);
 		    int randPositionZ = Random.Range(AmountCellWhereDontSpawnObstacles, widthMap - 1);
-		    if (CheсkCoordWithList(randPositionX, randPositionZ) == true)
+		    if (CheсkCoordWithList(randPositionX, randPositionZ))
 		    {
 			    AddCoordsToList(randPositionX, randPositionZ);
-			    float xRandPos = randPositionX * xOffset;
-			    if (randPositionZ % 2 == 1)
-			    {
-				    xRandPos += xOffset / 2f;
-			    }
-
+			    float xRandPos = SetXPos(randPositionX, randPositionZ);
 			    if (i % 2 == 1)
 			    {
 				    GameObject createdDestructibleWall = (GameObject) Instantiate(_prefabDestructibleWall,
@@ -74,23 +76,30 @@ public class Map : MonoBehaviour
 
     }
 
+    public float SetXPos(int x, int y)
+    {
+	    _xPos = x * xOffset;
+                
+	    if( y % 2 == 1 ) 
+	    {
+		    _xPos += xOffset/2f;
+	    }
+
+	    return _xPos;
+    }
+
     private void CreatingMap()
     {
 	    for (int x = 0; x < widthMap; x++) 
 	    {
-		    for (int y = 0; y < heightMap; y++) 
+		    for (int y = 0; y < heightMap; y++)
 		    {
-			    float xPos = x * xOffset;
-                
-			    if( y % 2 == 1 ) 
-			    {
-				    xPos += xOffset/2f;
-			    }
-			    GameObject hexGO = (GameObject)Instantiate(hexPrefab, new Vector3( xPos,0, y * zOffset  ), Quaternion.identity  );
+			    _xPos = SetXPos(x, y);
+			    GameObject hexGO = (GameObject)Instantiate(hexPrefab, new Vector3( _xPos,0, y * zOffset  ), Quaternion.identity  );
 			    SetOptionsForCell(hexGO,"Hex_", x,y);
 			    if (x == 0 || x == widthMap-1 ||  y == heightMap-1 || y == 0)
 			    {
-				    _createdWalls = (GameObject)Instantiate(_prefabIndestructibleWall, new Vector3( xPos,0, y * zOffset  ), Quaternion.identity  );
+				    _createdWalls = (GameObject)Instantiate(_prefabIndestructibleWall, new Vector3( _xPos,0, y * zOffset  ), Quaternion.identity  );
 				    SetOptionsForCell(_createdWalls,"HexWall_", x,y);
 			    }
 		    }
@@ -109,7 +118,7 @@ public class Map : MonoBehaviour
 	    var  coordsXZ =  busyCoordsX.Zip(busyCoordsZ, (x, z) => new Vector2Int( x, z ));
 	    foreach (var coords in coordsXZ)
 	    {
-		    if (coords.x == valueX && coords.y == valueZ)
+		    if (coords.x == valueX  && coords.y == valueZ )//((coords.x == valueX || coords.x + 1 == valueX || coords.x - 1 == valueX) && (coords.y == valueZ || coords.y - 1 == valueZ || coords.y + 1 == valueZ))
 		    {
 			    result = false;
 			    break;
