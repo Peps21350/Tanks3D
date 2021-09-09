@@ -1,25 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 using UnityEngine;
 using static ExtendingVector3;
 using Random = UnityEngine.Random;
+using Vector3 = UnityEngine.Vector3;
 
 public class Projectile : MonoBehaviour
 {
-        public float _flightRange;
-        public float _speed;
-        private Vector3 _spawnPosition;
-        public GameObject _tank;
-        [SerializeField] private Bonus _bonus;
-        public static int destroyedObject;
+        public GameObject tank;
+        public float flightRange;
+        public float speed;
         public bool isProjectileEnemi = true;
-        
 
-        public void init (float flightRange, float speed, float damage, GameObject tank, bool isProjectileEnemi)
+        [SerializeField] private GameGUI gameGUI;
+        [SerializeField] private Bonus _bonus;
+        [SerializeField] private Rigidbody rbProjectile;
+        private static int s_destroyedObject;
+        private Vector3 _spawnPosition;
+        
+        public void Init (float flightRange, float speed, float damage, GameObject tank, bool isProjectileEnemi)
         {
-                _flightRange = flightRange;
-                _speed = speed;
-                _tank = tank;
+                this.flightRange = flightRange;
+                this.speed = speed;
+                this.tank = tank;
                 this.isProjectileEnemi = isProjectileEnemi;
         }
 
@@ -28,70 +32,47 @@ public class Projectile : MonoBehaviour
                 if (other.gameObject.CompareTag("Destructible"))
                 {
                         Destroy(other.gameObject);
-                        destroyedObject++;
-                        if (destroyedObject % 2 == 0)
+                        s_destroyedObject++;
+                        if (s_destroyedObject % 2 == 0)
                         {
                                 int numberBonus = Random.Range(0, 2);
                                 Vector3 position = other.gameObject.transform.position;
                                 _bonus.CreatingBonus(position,numberBonus);
                         }
-
                         Destroy(gameObject);
                 }
                 if (other.gameObject.CompareTag("Indestructible"))
                 {
                         Destroy(gameObject);
                 }
-                
                 if (other.gameObject.CompareTag("Projectile"))
                 {
                         Destroy(other.gameObject);
                         Destroy(gameObject);
                 }
+
+                if (other.gameObject.CompareTag("Player"))
+                {
+                        //playerWin = false;
+                        //gameGUI.DisplayEndMenu();
+                }
         }
 
         private void FixedUpdate()
         {
+                transform.Translate( Vector3.forward * speed * Time.fixedDeltaTime);
                 Vector3 currentPosition = transform.position;
-                if ( IsGreaterOrEqual(currentPosition,  _tank.transform.position + new Vector3(_flightRange, 0, _flightRange)) == true)
+                if (gameObject != null)
                 {
-                        Destroy(gameObject);
+                        if( Vector3.Distance(currentPosition, tank.transform.position) >= flightRange)
+                        {
+                                Destroy(gameObject);
+                        }
                 }
         }
         
-
-        public void Move()
-        {
-                Rigidbody rbProjectile = this.GetComponent<Rigidbody>();
-                rbProjectile.AddForce(this.transform.forward * _speed, ForceMode.Impulse);
-        }
-        
-       
-}
-
-public static class ExtendingVector3
-{
-        public static bool IsGreaterOrEqual(Vector3 local, Vector3 other)
-        {
-                if(local.x >= other.x ||  local.z >= other.z)
-                {
-                        return true;
-                }
-                else
-                {
-                        return false;
-                }
-        }
-
-        public static bool IsLesserOrEqual(Vector3 local, Vector3 other)
-        {
-                if(local.x <= other.x || local.z <= other.z)
-                {
-                        return true;
-                }
-                else
-                {
-                        return false;
-                }
-        }
+        // public void Move()
+        // {
+        //         rbProjectile.AddForce(this.transform.forward * speed, ForceMode.Impulse);
+        // }
 }

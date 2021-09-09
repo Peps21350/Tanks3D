@@ -5,42 +5,33 @@ using UnityEngine.AI;
 
 public class Map : MonoBehaviour
 {
+	[HideInInspector] public List<int> busyCoordsX;
+	[HideInInspector] public List<int> busyCoordsZ;
+	[HideInInspector] public int widthMap = 40;
+	[HideInInspector] public int heightMap = 40;
+	public static bool isStart = true;
+	public const int AmountCellWhereDontSpawnObstacles = 3;
+	
     [SerializeField] private GameObject hexPrefab;
     [SerializeField] private GameObject _prefabIndestructibleWall;
     [SerializeField] private GameObject _prefabDestructibleWall;
     [SerializeField] private GameObject _nawMesh;
-    private GameObject _createdWalls;
-    [HideInInspector] public List<int> busyCoordsX;
-    [HideInInspector] public List<int> busyCoordsZ;
     [SerializeField] private Bonus _bonus;
-    [HideInInspector] public static bool isStart = true;
-    
-    
-	// a place where obstacles do not spawn
-	public const int AmountCellWhereDontSpawnObstacles = 3;
-
-	private float _xPos;
+    private GameObject _createdWalls;
+    private float _xPos;
 	private float _zPos;
+	[HideInInspector] public float xOffset = 0.882f;
+	[HideInInspector] public float zOffset = 0.764f;
 	
-
-
-	[HideInInspector] public int widthMap = 40;
-    [HideInInspector] public int heightMap = 40;
-
-    float xOffset = 0.882f;
-    float zOffset = 0.764f;
-
-
     void Start () 
     {
-	    if (isStart == true)
+	    if (isStart)
 	    {
 		    CreatingMap();
 		    CreatingObstacles();
 	    }
     }
-
-
+    
     private void CreatingObstacles()
     {
 	    int minCountObstacle = (heightMap * widthMap) / 5;
@@ -69,7 +60,9 @@ public class Map : MonoBehaviour
 			    }
 		    }
 		    else
+		    {
 			    randAmountObstacles++;
+		    }
 	    }
 	    _nawMesh.SetActive(true);
 	    _nawMesh.GetComponent<NavMeshSurface>().BuildNavMesh();
@@ -130,18 +123,9 @@ public class Map : MonoBehaviour
     private void SetOptionsForCell(GameObject cell, string nameCell, int x, int y)
     {
 	    cell.name = nameCell + x + "_" + y;
-                
 	    cell.GetComponent<Hex>().x = x;
 	    cell.GetComponent<Hex>().y = y;
-                
 	    cell.transform.SetParent(this.transform);
-                
 	    cell.isStatic = true;
-    }
-
-    // Update is called once per frame
-    void Update () 
-    {
-	
     }
 }

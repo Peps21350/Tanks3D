@@ -3,13 +3,13 @@ using UnityEngine.AI;
 
 public class OrdinaryEnemyTank : Tank
 {
-        private Vector3 targetPosition;
-        [SerializeField] private PlayerTank _playerTank;
-        [SerializeField] private Map _map;
         public float seeDistance = 5f;
         public float attackDistance = 2f;
-        [SerializeField] private NavMeshAgent _navMeshAgent;
         
+        [SerializeField] private Map map;
+        [SerializeField] private NavMeshAgent navMeshAgent;
+        [SerializeField] private Vector3 wayPoint;
+        private GameObject _player; 
         
         protected override void OnCollisionEnter(Collision other)
         {
@@ -17,51 +17,62 @@ public class OrdinaryEnemyTank : Tank
                 
                 if (other.collider.CompareTag("Destructible"))
                 {
-                        Fier(isEnemy);
+                        Fire(isEnemy);
                 }
         }
         
         void Start ()
         {
-                _navMeshAgent.speed = speed;
+                navMeshAgent.speed = speed;
                 CreatingTargetPosition();
+                _player = GameObject.FindWithTag("Player");
         }
 
         private void CreatingTargetPosition()
         {
-                int randPositionX = Random.Range(1, _map.heightMap - 1);
-                int randPositionZ = Random.Range(1, _map.widthMap - 1);
-                if (_map.CheсkCoordWithList(randPositionX, randPositionZ))
+                int randPositionX = Random.Range(1, map.heightMap - 1);
+                int randPositionZ = Random.Range(1, map.widthMap - 1);
+                if (map.CheсkCoordWithList(randPositionX, randPositionZ))
                 {
-                        targetPosition = new Vector3(randPositionX, 0f, randPositionX);
+                        wayPoint = new Vector3(randPositionX, 0f, randPositionX);
+                }
+                else
+                {
+                        CreatingTargetPosition();
                 }
         }
 
 
         private void Update()
         {
-                Vector3 playerCoord = _playerTank.transform.position;
-                if (Vector3.Distance (transform.position, playerCoord) < seeDistance) 
+                Fire(isEnemy);
+                Vector3 playerPosition = _player.transform.position;
+                Debug.Log($"{playerPosition} + OrdinaryEnemyTank");
+                if (Vector3.Distance (transform.position, playerPosition) < seeDistance) 
                 {
-                        if (Vector3.Distance (transform.position, playerCoord) > attackDistance) 
+                        if (Vector3.Distance (transform.position, playerPosition) > attackDistance) 
                         {
-                                transform.LookAt (targetPosition);
-                                _navMeshAgent.destination = targetPosition;
+                                transform.LookAt (playerPosition);
+                                navMeshAgent.destination = playerPosition;
                         } 
                         else 
                         {
-                                _navMeshAgent.speed = 0;
-                                transform.LookAt (playerCoord);
-                                if (_opportunityToShoot == true)
+                                navMeshAgent.speed = 0;
+                                transform.LookAt (playerPosition);
+                                if (opportunityToShoot)
                                 {
-                                        Fier(isEnemy);
+                                        Fire(isEnemy);
                                 }
                         }
                 }
                 else
                 {
-                        //_navMeshAgent.destination = targetPosition;
-                        _navMeshAgent.destination = new Vector3(12, 0.07f, 22);
+                        navMeshAgent.destination = wayPoint;
+                        if (Vector3.Distance(transform.position, wayPoint) < 10)
+                        {
+                                CreatingTargetPosition();
+                        }
+                        Fire(isEnemy);
                 }
         }
 }

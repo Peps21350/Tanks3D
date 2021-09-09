@@ -1,9 +1,27 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections;
+using UnityEngine;
 
 public class GameMechanic : MonoBehaviour
 {
-        [SerializeField] private GameGUI _gameGUI;
-        //[SerializeField] private GameGUI _gameGUI;
+        [SerializeField] private GameGUI gameGUI;
+        public float currentTime = 0;
+        public static bool PlayerWin = false;
         
-        public static bool playerWin = false;
+
+        public IEnumerator Timer()
+        {
+                while (true)
+                {
+                        currentTime++;
+                        
+                        yield return new WaitForSeconds(1);
+                }
+                // ReSharper disable once IteratorNeverReturns
+        }
+
+        private void Start()
+        {
+                StartCoroutine(Timer());
+        }
 }
