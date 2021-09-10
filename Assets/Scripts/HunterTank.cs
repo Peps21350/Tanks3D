@@ -19,39 +19,39 @@ public class HunterTank : Tank
         }
     }
     
-    void Start ()
+    private void Start ()
     {
         navMeshAgent.speed = speed;
         _player = GameObject.FindWithTag("Player");
         StartCoroutine(Reload());
     }
    
-    void Update ()
+    private void Update ()
     {
-        Vector3 playerPosition = _player.transform.position;
-        Fire(isEnemy);
-        Debug.Log($"{playerPosition} + HunterTank");
-        if (Vector3.Distance (transform.position, playerPosition) < seeDistance) 
+        if (gameObject != null && _player != null)
         {
-            if (Vector3.Distance (transform.position, playerPosition) > attackDistance) 
+            Vector3 playerPosition = _player.transform.position;
+            Fire(isEnemy);
+            if (Vector3.Distance (transform.position, playerPosition) < seeDistance) 
             {
-                transform.LookAt (playerPosition);
+                if (Vector3.Distance (transform.position, playerPosition) > attackDistance) 
+                {
+                    transform.LookAt (playerPosition);
+                    navMeshAgent.destination = playerPosition;
+                } 
+                else 
+                {
+                    navMeshAgent.speed = 0;
+                    transform.LookAt (playerPosition);
+                    Fire(isEnemy);
+                }
+            }
+            else
+            {
                 navMeshAgent.destination = playerPosition;
-            } 
-            else 
-            {
-                navMeshAgent.speed = 0;
-                transform.LookAt (playerPosition);
-                 if (opportunityToShoot)
-                 {
-                     Fire(isEnemy);
-                 }
+                Fire(isEnemy);
             }
         }
-        else
-        {
-            navMeshAgent.destination = playerPosition;
-            Fire(isEnemy);
-        }
+
     }
 }

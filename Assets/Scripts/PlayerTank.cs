@@ -3,6 +3,7 @@
 public class PlayerTank : Tank
 {
     [SerializeField] private Rigidbody _tankRB;
+    public static bool isAlive = true;
 
     public virtual void Move(float horizontal, float vertical)
     {
@@ -19,6 +20,7 @@ public class PlayerTank : Tank
     private void Start()
     {
         StartCoroutine(Reload());
+        isAlive = true;
     }
 }
     

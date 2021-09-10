@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Security.Cryptography;
 using UnityEngine;
 
 public class Bonus : MonoBehaviour
@@ -6,18 +7,9 @@ public class Bonus : MonoBehaviour
     public TypeBonus typeBonus;
     
     [SerializeField] private GameObject[] prefabsBonus;
-    private const float _SpeedRotationBonus = 0.3f;
     private GameObject _createdBonus;
-    private float _currentTime = 0;
-    private const int _LifeTimeBonus = 10;
-
-    private void RotateBonus()
-    {
-        if (_createdBonus != null)
-        {
-            _createdBonus.transform.Rotate(0, 0, 0.09f, Space.Self);
-        }
-    }
+    private float _timeRemaining = 10;
+    private static bool _timerIsRunning = false;
     
     public void CreatingBonus(Vector3 coord, int typeBonus)
     {
@@ -29,28 +21,23 @@ public class Bonus : MonoBehaviour
         {
             _createdBonus = Instantiate(prefabsBonus[typeBonus], new Vector3(coord.x,0.224f,coord.z), Quaternion.identity);
         }
-        //StartCoroutine(Timer());
+        _timerIsRunning = true;
     }
 
     private void Update()
     {
-        RotateBonus();
-        if (_currentTime >= _LifeTimeBonus)
+        if (_timerIsRunning)
         {
-            StopCoroutine(Timer());
-            _currentTime = 0;
+            if (_timeRemaining > 0)
+            {
+                _timeRemaining -= Time.deltaTime;
+            }
+            else
+            {
+                Destroy(gameObject);
+                _timerIsRunning = false;
+            }
         }
-    }
-    
-    public IEnumerator Timer()
-    {
-        while (true)
-        {
-            _currentTime++;
-                        
-            yield return new WaitForSeconds(1);
-        }
-        // ReSharper disable once IteratorNeverReturns
     }
 }
 

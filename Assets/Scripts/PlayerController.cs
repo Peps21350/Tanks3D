@@ -5,7 +5,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private JoystickController joystickController;
     [SerializeField] private PlayerTank playerTank;
     [SerializeField] private GameObject screensaver;
-    
+
     private void FixedUpdate()
     {
         playerTank.Move(joystickController.Horizontal,joystickController.Vertical);

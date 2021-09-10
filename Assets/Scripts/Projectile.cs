@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
 using UnityEngine;
-using static ExtendingVector3;
 using Random = UnityEngine.Random;
-using Vector3 = UnityEngine.Vector3;
 
 public class Projectile : MonoBehaviour
 {
@@ -15,10 +11,9 @@ public class Projectile : MonoBehaviour
 
         [SerializeField] private GameGUI gameGUI;
         [SerializeField] private Bonus _bonus;
-        [SerializeField] private Rigidbody rbProjectile;
         private static int s_destroyedObject;
         private Vector3 _spawnPosition;
-        
+
         public void Init (float flightRange, float speed, float damage, GameObject tank, bool isProjectileEnemi)
         {
                 this.flightRange = flightRange;
@@ -51,10 +46,17 @@ public class Projectile : MonoBehaviour
                         Destroy(gameObject);
                 }
 
+                if (other.gameObject.CompareTag("Enemy"))
+                {
+                        GameMechanic.DestroyedEnemy++;
+                }
+
                 if (other.gameObject.CompareTag("Player"))
                 {
-                        //playerWin = false;
-                        //gameGUI.DisplayEndMenu();
+                        gameGUI.DisplayEndGame();
+                        PlayerTank.isAlive = false;
+                        Destroy(gameObject);
+                        Destroy(other.gameObject);
                 }
         }
 
@@ -62,7 +64,7 @@ public class Projectile : MonoBehaviour
         {
                 transform.Translate( Vector3.forward * speed * Time.fixedDeltaTime);
                 Vector3 currentPosition = transform.position;
-                if (gameObject != null)
+                if (gameObject != null && tank.gameObject != null)
                 {
                         if( Vector3.Distance(currentPosition, tank.transform.position) >= flightRange)
                         {
@@ -70,9 +72,4 @@ public class Projectile : MonoBehaviour
                         }
                 }
         }
-        
-        // public void Move()
-        // {
-        //         rbProjectile.AddForce(this.transform.forward * speed, ForceMode.Impulse);
-        // }
 }

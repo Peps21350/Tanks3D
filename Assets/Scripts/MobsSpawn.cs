@@ -7,7 +7,7 @@ public class MobsSpawn : MonoBehaviour
     [SerializeField] private GameObject[] tanksPrefabs;
     [SerializeField] private HunterTank hunterTank;
     [SerializeField] private OrdinaryEnemyTank ordinaryEnemyTank;
-    [SerializeField] private int countTanks = 1;
+    private int _countTanks = 5;
     public static int AliveTanks;
     
     private void Spawn(int countTanksToSpawn )
@@ -18,12 +18,12 @@ public class MobsSpawn : MonoBehaviour
             int randPositionZ = Random.Range(Map.AmountCellWhereDontSpawnObstacles, map.widthMap - 10);
             if (map.CheсkCoordWithList(randPositionX, randPositionZ))
             {
-                float xRandPos = randPositionX * map.xOffset;
-                if (randPositionZ % 2 == 1)
-                {
-                    xRandPos += map.xOffset / 2f;
-                }
-                Vector3 positionTank = new Vector3(xRandPos, 0.06f, randPositionZ * map.zOffset);
+                // float xRandPos = randPositionX * map.xOffset;
+                // if (randPositionZ % 2 == 1)
+                // {
+                //     xRandPos += map.xOffset / 2f;
+                // }
+                Vector3 positionTank = new Vector3(randPositionX, 0.06f, randPositionZ * map.zOffset);
                 if (i % 2 == 0)
                 {
                     Instantiate(tanksPrefabs[0], positionTank,Quaternion.identity);
@@ -34,18 +34,20 @@ public class MobsSpawn : MonoBehaviour
                     Instantiate(tanksPrefabs[1], positionTank,Quaternion.identity);
                     hunterTank.Init(0.5f, 7);
                 }
-                countTanks--;
+                _countTanks--;
+                AliveTanks++;
+                Debug.Log($"{AliveTanks}");
             }
             else
             {
-                Spawn(countTanks);
+                Spawn(_countTanks);
             }
         }
     }
 
-    private void Start()
+    private void Awake()
     {
-        Spawn(countTanks);
-        AliveTanks = countTanks;
+        AliveTanks = 0;
+        Spawn(_countTanks);
     }
 }

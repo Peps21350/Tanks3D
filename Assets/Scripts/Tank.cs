@@ -1,8 +1,6 @@
 ﻿using System.Collections;
-using UnityEditor.Profiling.Memory.Experimental;
 using UnityEngine;
 using Random = UnityEngine.Random;
-
 
 public class Tank : MonoBehaviour
 {
@@ -16,6 +14,7 @@ public class Tank : MonoBehaviour
     [SerializeField] protected float flightDistanceProjectile;
     
     [SerializeField] private float currentTime = 0;
+    [SerializeField] private GameMechanic gameMechanic;
     
     public bool opportunityToShoot = false;
     
@@ -43,19 +42,18 @@ public class Tank : MonoBehaviour
 
         if (other.gameObject.CompareTag("Projectile"))
         {
+            int countDestroyedTanks = 0;
             if (other.gameObject.GetComponent<Projectile>().isProjectileEnemi != isEnemy)
             {
-                Destroy(gameObject);
-                MobsSpawn.AliveTanks--;
+                Debug.Log($"{MobsSpawn.AliveTanks}");
+                countDestroyedTanks++;
+                //MobsSpawn.AliveTanks--;
+                //gameMechanic.SetScore(countDestroyedTanks);
                 Destroy(other.gameObject);
                 Vector3 position = gameObject.transform.position;
                 int numberBonus = Random.Range(0, 2);
                 bonus.CreatingBonus(position, numberBonus);
-                if (MobsSpawn.AliveTanks == 0)
-                {
-                    GameMechanic.PlayerWin = true;
-                    gameGUI.DisplayEndMenu();
-                }
+                Destroy(gameObject);
             }
             else
             {
@@ -63,8 +61,7 @@ public class Tank : MonoBehaviour
             }
         }
     }
-
-
+    
     public void Fire(bool isEnemi)
     {
         if (opportunityToShoot && projectilePrefab != null)
@@ -75,7 +72,6 @@ public class Tank : MonoBehaviour
             var componentProjectile = createdProjectile.GetComponent<Projectile>();
             createdProjectile.transform.rotation = transform.rotation;
             componentProjectile.Init(flightDistanceProjectile, 1, 1, gameObject, isEnemi);
-            //componentProjectile.Move();
             currentTime = 0;
             opportunityToShoot = false;
         }
@@ -86,7 +82,6 @@ public class Tank : MonoBehaviour
         while (true)
         {
             currentTime++;
-            Debug.Log("_opportunityToShoot: " + (opportunityToShoot) + (currentTime));
             if (currentTime >= timeReload)
             {
                 opportunityToShoot = true;
@@ -95,5 +90,4 @@ public class Tank : MonoBehaviour
         }
         // ReSharper disable once IteratorNeverReturns
     }
-    
 }

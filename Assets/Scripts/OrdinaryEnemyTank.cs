@@ -9,7 +9,8 @@ public class OrdinaryEnemyTank : Tank
         [SerializeField] private Map map;
         [SerializeField] private NavMeshAgent navMeshAgent;
         [SerializeField] private Vector3 wayPoint;
-        private GameObject _player; 
+        private GameObject _player;
+        private const int _RadiusWayPoint = 10;
         
         protected override void OnCollisionEnter(Collision other)
         {
@@ -21,58 +22,70 @@ public class OrdinaryEnemyTank : Tank
                 }
         }
         
-        void Start ()
+        private void Start ()
         {
                 navMeshAgent.speed = speed;
                 CreatingTargetPosition();
                 _player = GameObject.FindWithTag("Player");
+                StartCoroutine(Reload());
         }
 
         private void CreatingTargetPosition()
         {
-                int randPositionX = Random.Range(1, map.heightMap - 1);
-                int randPositionZ = Random.Range(1, map.widthMap - 1);
-                if (map.CheсkCoordWithList(randPositionX, randPositionZ))
+                while (true)
                 {
-                        wayPoint = new Vector3(randPositionX, 0f, randPositionX);
-                }
-                else
-                {
-                        CreatingTargetPosition();
+                        int randPositionX = Random.Range(1, map.heightMap - 1);
+                        int randPositionZ = Random.Range(1, map.widthMap - 1);
+                        if (map.CheсkCoordWithList(randPositionX, randPositionZ))
+                        {
+                                wayPoint = new Vector3(randPositionX, 0f, randPositionX);
+                        }
+                        else
+                        {
+                                continue;
+                        }
+
+                        break;
                 }
         }
 
 
         private void Update()
         {
-                Fire(isEnemy);
-                Vector3 playerPosition = _player.transform.position;
-                Debug.Log($"{playerPosition} + OrdinaryEnemyTank");
-                if (Vector3.Distance (transform.position, playerPosition) < seeDistance) 
+                if (gameObject != null && _player != null)
                 {
-                        if (Vector3.Distance (transform.position, playerPosition) > attackDistance) 
+                        if (navMeshAgent.isActiveAndEnabled)
                         {
-                                transform.LookAt (playerPosition);
-                                navMeshAgent.destination = playerPosition;
-                        } 
-                        else 
-                        {
-                                navMeshAgent.speed = 0;
-                                transform.LookAt (playerPosition);
-                                if (opportunityToShoot)
+                                Fire(isEnemy);
+                                Vector3 playerPosition = _player.transform.position;
+                                if (Vector3.Distance (transform.position, playerPosition) < seeDistance) 
                                 {
-                                        Fire(isEnemy);
+                                        if (Vector3.Distance (transform.position, playerPosition) > attackDistance) 
+                                        {
+                                                transform.LookAt (playerPosition);
+                                                navMeshAgent.destination = playerPosition;
+                                        } 
+                                        else 
+                                        {
+                                                navMeshAgent.speed = 0;
+                                                transform.LookAt (playerPosition);
+                                                Fire(isEnemy);
+                                        }
                                 }
+                                else
+                                {
+                                        navMeshAgent.destination = wayPoint;
+                                        if (Vector3.Distance(transform.position, wayPoint) < _RadiusWayPoint)
+                                        {
+                                                CreatingTargetPosition();
+                                        }
+                                        Fire(isEnemy);
+                                } 
                         }
-                }
-                else
-                {
-                        navMeshAgent.destination = wayPoint;
-                        if (Vector3.Distance(transform.position, wayPoint) < 10)
+                        else
                         {
-                                CreatingTargetPosition();
+                                Destroy(gameObject);
                         }
-                        Fire(isEnemy);
                 }
         }
 }
