@@ -4,6 +4,8 @@ using Random = UnityEngine.Random;
 
 public class Tank : MonoBehaviour
 {
+    public bool opportunityToShoot = false;
+    
     [SerializeField] protected GameObject projectilePrefab;
     [SerializeField] protected GameObject barrel;
     [SerializeField] protected Bonus bonus;
@@ -15,8 +17,6 @@ public class Tank : MonoBehaviour
     
     [SerializeField] private float currentTime = 0;
     [SerializeField] private GameMechanic gameMechanic;
-    
-    public bool opportunityToShoot = false;
     
     public void Init(float speed, float speedReload)
     {
@@ -47,8 +47,6 @@ public class Tank : MonoBehaviour
             {
                 Debug.Log($"{MobsSpawn.AliveTanks}");
                 countDestroyedTanks++;
-                //MobsSpawn.AliveTanks--;
-                //gameMechanic.SetScore(countDestroyedTanks);
                 Destroy(other.gameObject);
                 Vector3 position = gameObject.transform.position;
                 int numberBonus = Random.Range(0, 2);
@@ -71,7 +69,7 @@ public class Tank : MonoBehaviour
             GameObject createdProjectile = Instantiate(projectilePrefab, positionSpawnProjectile, rotationProjectile);
             var componentProjectile = createdProjectile.GetComponent<Projectile>();
             createdProjectile.transform.rotation = transform.rotation;
-            componentProjectile.Init(flightDistanceProjectile, 1, 1, gameObject, isEnemi);
+            componentProjectile.Init(flightDistanceProjectile, 3, gameObject, isEnemi);
             currentTime = 0;
             opportunityToShoot = false;
         }

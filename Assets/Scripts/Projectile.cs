@@ -10,11 +10,11 @@ public class Projectile : MonoBehaviour
         public bool isProjectileEnemi = true;
 
         [SerializeField] private GameGUI gameGUI;
-        [SerializeField] private Bonus _bonus;
+        [SerializeField] private Bonus bonus;
         private static int s_destroyedObject;
         private Vector3 _spawnPosition;
 
-        public void Init (float flightRange, float speed, float damage, GameObject tank, bool isProjectileEnemi)
+        public void Init (float flightRange, float speed, GameObject tank, bool isProjectileEnemi)
         {
                 this.flightRange = flightRange;
                 this.speed = speed;
@@ -32,7 +32,7 @@ public class Projectile : MonoBehaviour
                         {
                                 int numberBonus = Random.Range(0, 2);
                                 Vector3 position = other.gameObject.transform.position;
-                                _bonus.CreatingBonus(position,numberBonus);
+                                bonus.CreatingBonus(position,numberBonus);
                         }
                         Destroy(gameObject);
                 }

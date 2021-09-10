@@ -41,6 +41,5 @@ public class GameMechanic : MonoBehaviour
                 PlayerTank.isAlive = true;
             }
             SetScore();
-            
         }
 }

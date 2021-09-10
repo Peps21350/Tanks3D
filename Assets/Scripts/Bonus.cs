@@ -1,13 +1,10 @@
-﻿using System.Collections;
-using System.Security.Cryptography;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class Bonus : MonoBehaviour
 {
     public TypeBonus typeBonus;
     
     [SerializeField] private GameObject[] prefabsBonus;
-    private GameObject _createdBonus;
     private float _timeRemaining = 10;
     private static bool _timerIsRunning = false;
     
@@ -15,11 +12,11 @@ public class Bonus : MonoBehaviour
     {
         if (typeBonus == 0)
         {
-            _createdBonus = Instantiate(prefabsBonus[typeBonus], new Vector3(coord.x,0.07f,coord.z), Quaternion.identity);
+            Instantiate(prefabsBonus[typeBonus], new Vector3(coord.x,0.07f,coord.z), Quaternion.identity);
         }
         else
         {
-            _createdBonus = Instantiate(prefabsBonus[typeBonus], new Vector3(coord.x,0.224f,coord.z), Quaternion.identity);
+            Instantiate(prefabsBonus[typeBonus], new Vector3(coord.x,0.224f,coord.z), Quaternion.identity);
         }
         _timerIsRunning = true;
     }

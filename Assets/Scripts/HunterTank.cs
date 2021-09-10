@@ -30,26 +30,28 @@ public class HunterTank : Tank
     {
         if (gameObject != null && _player != null)
         {
-            Vector3 playerPosition = _player.transform.position;
-            Fire(isEnemy);
-            if (Vector3.Distance (transform.position, playerPosition) < seeDistance) 
+            if (navMeshAgent.isOnNavMesh)
             {
-                if (Vector3.Distance (transform.position, playerPosition) > attackDistance) 
+                Vector3 playerPosition = _player.transform.position;
+                Fire(isEnemy);
+                if (Vector3.Distance (transform.position, playerPosition) < seeDistance) 
                 {
-                    transform.LookAt (playerPosition);
-                    navMeshAgent.destination = playerPosition;
-                } 
-                else 
-                {
-                    navMeshAgent.speed = 0;
-                    transform.LookAt (playerPosition);
-                    Fire(isEnemy);
+                    if (Vector3.Distance (transform.position, playerPosition) > attackDistance) 
+                    {
+                        transform.LookAt (playerPosition);
+                        navMeshAgent.destination = playerPosition;
+                    } 
+                    else 
+                    {
+                        navMeshAgent.speed = 0;
+                        transform.LookAt (playerPosition);
+                        Fire(isEnemy);
+                    }
                 }
             }
             else
             {
-                navMeshAgent.destination = playerPosition;
-                Fire(isEnemy);
+                gameObject.transform.position += new Vector3(0f, 0f, 0.5f);
             }
         }
 

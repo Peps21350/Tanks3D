@@ -48,13 +48,12 @@ public class OrdinaryEnemyTank : Tank
                         break;
                 }
         }
-
-
+        
         private void Update()
         {
                 if (gameObject != null && _player != null)
                 {
-                        if (navMeshAgent.isActiveAndEnabled)
+                        if (navMeshAgent.isOnNavMesh)
                         {
                                 Fire(isEnemy);
                                 Vector3 playerPosition = _player.transform.position;
@@ -84,8 +83,9 @@ public class OrdinaryEnemyTank : Tank
                         }
                         else
                         {
-                                Destroy(gameObject);
+                                gameObject.transform.position += new Vector3(0f, 0f, 0.5f);
                         }
+                        
                 }
         }
 }
